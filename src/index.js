@@ -23,12 +23,12 @@ class ServerlessLayers {
       'before:package:function:package': () => BbPromise.bind(this)
         .then(() => {
           return this.init()
-            .then(() => this.deployLayers())
+            .then(() => this.deployLayers());
         }),
       'before:package:initialize': () => BbPromise.bind(this)
         .then(() => {
           return this.init()
-            .then(() => this.deployLayers())
+            .then(() => this.deployLayers());
         }),
       'aws:info:displayLayers': () => BbPromise.bind(this)
         .then(() => this.init())
@@ -39,12 +39,12 @@ class ServerlessLayers {
       'plugin:uninstall:uninstall': () => BbPromise.bind(this)
         .then(() => {
           return this.init()
-            .then(() => this.cleanUpAllLayers())
+            .then(() => this.cleanUpAllLayers());
         }),
       'remove:remove': () => BbPromise.bind(this)
         .then(() => {
           return this.init()
-            .then(() => this.cleanUpAllLayers())
+            .then(() => this.cleanUpAllLayers());
         })
     };
   }
@@ -153,7 +153,7 @@ class ServerlessLayers {
 
     return {
       default: this.mergeCommonSettings(inboundSettings)
-    }
+    };
   }
 
   hasSettingsChanged() {
@@ -174,7 +174,6 @@ class ServerlessLayers {
     this.hasSettingsVerified = true;
 
     return this.bucketService.getFile(manifest).then((remoteSettings) => {
-
       // create and return true (changed)
       if (!remoteSettings) {
         return this.bucketService.putFile(manifest, currentSettings)
@@ -203,7 +202,7 @@ class ServerlessLayers {
 
     // it avoids issues if user changes some configuration
     // which will not be applied till dependencies be changed
-    let hasSettingsChanged = await this.hasSettingsChanged();
+    const hasSettingsChanged = await this.hasSettingsChanged();
 
     // check if directories content has changed
     // comparing hash md5 remote with local folder
@@ -220,16 +219,16 @@ class ServerlessLayers {
     }
 
     // check if something has changed
-    let hasChanged = (!hasFoldersChanged && !hasDepsChanged && !hasSettingsChanged);
+    const notChanged = (!hasFoldersChanged && !hasDepsChanged && !hasSettingsChanged);
 
     // merge package default options
     this.mergePackageOptions();
 
     const currentLayerARN = await this.getLayerArn();
-    if (hasChanged && currentLayerARN) {
-     this.log(`${chalk.inverse.green(' No changes ')}! Using same layer arn: ${this.logArn(currentLayerARN)}`);
-     this.relateLayerWithFunctions(currentLayerARN);
-     return;
+    if (notChanged && currentLayerARN) {
+      this.log(`${chalk.inverse.green(' No changes ')}! Using same layer arn: ${this.logArn(currentLayerARN)}`);
+      this.relateLayerWithFunctions(currentLayerARN);
+      return;
     }
 
     // ENABLED by default
@@ -329,7 +328,7 @@ class ServerlessLayers {
       exclude: []
     };
 
-    this.service.package = {...opts, ...pkg};
+    this.service.package = { ...opts, ...pkg };
 
     for (const excludeFile of packageExclude) {
       const hasRule = (this.service.package.exclude || '').indexOf(excludeFile);
@@ -362,7 +361,7 @@ class ServerlessLayers {
         functions[funcName].layers = Array.from(new Set(functions[funcName].layers));
         this.log(`function.${chalk.magenta.bold(funcName)} - ${this.logArn(layerArn)}`, ' ✓');
       } else {
-        this.warn(`(Skipped) function.${chalk.magenta.bold(funcName)}`, ` x`);
+        this.warn(`(Skipped) function.${chalk.magenta.bold(funcName)}`, ' x');
       }
     });
 
@@ -382,14 +381,14 @@ class ServerlessLayers {
   }
 
   getDependenciesList() {
-    return Object.keys((this.localPackage.dependencies||[])).map(x => (
+    return Object.keys((this.localPackage.dependencies || [])).map(x => (
       `${x}@${this.localPackage.dependencies[x]}`
     ));
   }
 
   async finalizeDeploy() {
     const cliOpts = this.provider.options;
-    this.logGroup("Layers Info");
+    this.logGroup('Layers Info');
     Object.keys(this.service.functions).forEach(funcName => {
       const lambdaFunc = this.service.functions[funcName];
       const layers = lambdaFunc.layers || [];
@@ -410,7 +409,7 @@ class ServerlessLayers {
     console.log('\n');
   }
 
-  log(msg, signal=' ○') {
+  log(msg, signal = ' ○') {
     console.log('...' + `${chalk.greenBright.bold(signal)} ${chalk.white(msg)}`);
   }
 
@@ -419,12 +418,12 @@ class ServerlessLayers {
     this.serverless.cli.log(`[ LayersPlugin ]: ${chalk.magenta.bold('=>')} ${chalk.greenBright.bold(msg)}`);
   }
 
-  warn(msg, signal=' ∅') {
-    console.log('...' + chalk.yellowBright(`${chalk.yellowBright.bold(signal)} ${msg}`));
+  warn(msg, signal = ' ∅') {
+    console.log(`...${chalk.yellowBright(`${chalk.yellowBright.bold(signal)} ${msg}`)}`);
   }
 
-  error(msg, signal=' ⊗') {
-    console.log('...' + chalk.red(`${signal} ${chalk.white.bold(msg)}`));
+  error(msg, signal = ' ⊗') {
+    console.log(`...${chalk.red(`${signal} ${chalk.white.bold(msg)}`)}`);
   }
 
   cleanUpLayers() {
@@ -432,12 +431,12 @@ class ServerlessLayers {
   }
 
   logArn(arn) {
-    let pattern = /arn:aws:lambda:([^:]+):([0-9]+):layer:([^:]+):([0-9]+)/g;
-    let region = chalk.bold('$1');
-    let name = chalk.magenta('$3');
-    let formated = chalk.white(`arn:aws:lambda:${region}:*********:${name}:$4`);
+    const pattern = /arn:aws:lambda:([^:]+):([0-9]+):layer:([^:]+):([0-9]+)/g;
+    const region = chalk.bold('$1');
+    const name = chalk.magenta('$3');
+    const formated = chalk.white(`arn:aws:lambda:${region}:*********:${name}:$4`);
 
-    let text = "";
+    let text = '';
     switch (typeof arn) {
       case 'object':
         if (arn.Ref) {

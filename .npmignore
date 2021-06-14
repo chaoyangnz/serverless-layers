@@ -6,3 +6,4 @@ bin/*
 src/*
 demos/*
 tests/*
+.idea

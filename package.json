@@ -1,5 +1,5 @@
 {
-  "name": "serverless-layers",
+  "name": "serverless-plugin-layers",
   "version": "2.3.3",
   "description": "",
   "main": "lib/index.js",
